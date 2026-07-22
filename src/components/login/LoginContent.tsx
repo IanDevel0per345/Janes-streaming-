@@ -51,7 +51,6 @@ export default function LoginContent() {
   const [tmdbToken, setTmdbToken] = useState("");
   const [guestName, setGuestName] = useState("");
   const [guestSessionCode, setGuestSessionCode] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -187,7 +186,6 @@ export default function LoginContent() {
         provider: providerLock ? undefined : selectedProvider,
         config: providerLock ? undefined : config,
         profilePicture: profilePicture || undefined,
-        rememberMe: rememberMe || undefined
       });
       return res.data;
 
@@ -395,8 +393,6 @@ export default function LoginContent() {
                   plexPinCode={plexPinCode}
                   setPlexPinCode={setPlexPinCode}
                   plexAuthUrl={plexAuthUrl}
-                  rememberMe={rememberMe}
-                  setRememberMe={setRememberMe}
                 />
               )}
 

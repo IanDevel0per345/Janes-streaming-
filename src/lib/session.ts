@@ -2,7 +2,7 @@ import { SessionOptions } from "iron-session";
 import { getAuthSecret } from "./server/session-secret";
 import { config } from "./config";
 
-export async function getSessionOptions(overrides?: Partial<SessionOptions>): Promise<SessionOptions> {
+export async function getSessionOptions(): Promise<SessionOptions> {
   const shouldForceSecure = config.app.appPublicUrl?.startsWith("https://");
   return {
     password: await getAuthSecret(),
@@ -15,6 +15,5 @@ export async function getSessionOptions(overrides?: Partial<SessionOptions>): Pr
       sameSite: "lax",
       path: config.app.basePath || "/",
     },
-    ...overrides,
   };
 }

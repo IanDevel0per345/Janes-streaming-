@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: "Invalid input" }, { status: 400 });
         }
 
-        const { username, password, provider: bodyProvider, config: providerConfig, profilePicture, rememberMe } = validated.data;
+        const { username, password, provider: bodyProvider, config: providerConfig, profilePicture } = validated.data;
         usernameForLog = username;
 
         const baseDeviceId = crypto.randomUUID();
@@ -54,11 +54,7 @@ export async function POST(request: NextRequest) {
         }
 
         const cookieStore = await cookies();
-        const opts = await getSessionOptions();
-        if (rememberMe) {
-          opts.ttl = 30 * 24 * 60 * 60; // 30 days
-        }
-        const session = await getIronSession<SessionData>(cookieStore, opts);
+        const session = await getIronSession<SessionData>(cookieStore, await getSessionOptions());
 
         session.user = {
             Id: userId,
