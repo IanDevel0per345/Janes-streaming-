@@ -282,7 +282,7 @@ function TabsContents({
     >
       <motion.div
         className="flex md:max-w-screen max-w-full"
-        animate={{ x: activeIndex * -50 + '%' }}
+        animate={{ x: `${(activeIndex / childrenArray.length) * -100}%` }}
         transition={transition}
       >
         {childrenArray.map((child, index) => (
