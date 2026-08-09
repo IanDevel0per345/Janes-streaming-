@@ -276,7 +276,6 @@ export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionC
                         className="w-full h-full border-0"
                         allowFullScreen
                         allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                        sandbox="allow-scripts allow-same-origin"
                         referrerPolicy="no-referrer"
                         onError={handleSourceError}
                         title={`Player - ${movie.Name}`}

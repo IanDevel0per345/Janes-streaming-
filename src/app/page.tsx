@@ -2,7 +2,8 @@
 import { CardDeck } from "@/components/deck/CardDeck";
 import { SessionManager } from "@/components/session/SessionManager";
 import { LikesList } from "@/components/likes/LikesList";
-import { GalleryHorizontalEnd, Heart } from "lucide-react";
+import { CatalogList } from "@/components/catalog/CatalogList";
+import { GalleryHorizontalEnd, Heart, LayoutGrid } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/animate-ui/components/animate/tabs";
 import { SettingsSidebar } from "@/components/home/SettingsSidebar";
 import { useState } from "react";
@@ -16,7 +17,8 @@ export default function Home() {
   const [tab, setTab] = useState("swipe");
 
   useHotkeys("1", () => setTab("swipe"), []);
-  useHotkeys("2", () => setTab("likes"), []);
+  useHotkeys("2", () => setTab("catalog"), []);
+  useHotkeys("3", () => setTab("likes"), []);
 
   return (
     <main className="overflow-hidden h-full pt-[env(safe-area-inset-top)] font-sans">
@@ -33,14 +35,20 @@ export default function Home() {
           onValueChange={setTab}
           className="gap-0 w-full sm:max-w-md min-w-0 -mt-1.5"
         >
-          <TabsList className="grid mx-auto h-fit grid-cols-2 bg-muted/30 rounded-full z-0">
-            <TabsTrigger value="swipe" className="h-11 w-16 group rounded-full z-0">
+          <TabsList className="grid mx-auto h-fit grid-cols-3 bg-muted/30 rounded-full z-0">
+            <TabsTrigger value="swipe" className="h-11 w-14 group rounded-full z-0">
               <GalleryHorizontalEnd
                 className="size-5 z-0 text-foreground fill-none transition-all group-data-[state=active]:fill-foreground"
               />
             </TabsTrigger>
 
-            <TabsTrigger value="likes" className="h-11 w-16 group rounded-full z-0">
+            <TabsTrigger value="catalog" className="h-11 w-14 group rounded-full z-0">
+              <LayoutGrid
+                className="size-5 z-0 text-foreground fill-none transition-all group-data-[state=active]:fill-foreground"
+              />
+            </TabsTrigger>
+
+            <TabsTrigger value="likes" className="h-11 w-14 group rounded-full z-0">
               <Heart
                 className="size-5 z-0 text-foreground fill-none transition-all group-data-[state=active]:fill-foreground"
               />
@@ -50,6 +58,9 @@ export default function Home() {
           <TabsContents className="grid max-h-screen">
             <TabsContent value="swipe" className={cn("h-full px-6 outline-none mt-1 w-full sm:max-w-md min-w-0 transition-opacity duration ease-in-out opacity-100", tab != "swipe" && "opacity-0")}>
               <CardDeck />
+            </TabsContent>
+            <TabsContent value="catalog" className={cn("h-full px-6 outline-none mt-4 w-full sm:max-w-md min-w-0 transition-opacity duration ease-in-out opacity-100", tab != "catalog" && "opacity-0")}>
+              <CatalogList />
             </TabsContent>
             <TabsContent value="likes" className={cn("h-full px-6 outline-none mt-4 w-full sm:max-w-md min-w-0 transition-opacity duration ease-in-out opacity-100", tab != "likes" && "opacity-0")}>
               <LikesList />
