@@ -240,7 +240,7 @@ export function CardDeck() {
 
   // Fetch next page when deck is running low
   useEffect(() => {
-    if (activeDeck.length < 10 && hasNextPage && !isFetchingNextPage) {
+    if (activeDeck.length < 20 && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [activeDeck.length, hasNextPage, isFetchingNextPage, fetchNextPage]);

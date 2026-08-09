@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Clock, Star, HeartOff, Bookmark, ShieldCheck, ExternalLink, Percent } from "lucide-react";
+import { Play, Clock, Star, HeartOff, Bookmark, ShieldCheck, ExternalLink, Percent, X, AlertCircle, Loader2 } from "lucide-react";
 import { UserAvatarList } from "../session/UserAvatarList";
 import { useQuery } from "@tanstack/react-query";
 import { MediaItem, WatchProvider } from "@/types";
@@ -23,6 +23,7 @@ import { TMDB_MOVIE_BASE_URL } from "@/lib/constants";
 import { getLanguageLabel } from "@/lib/language";
 import { getProviderDetailsUrl } from "@/lib/provider-links";
 import { ProviderType } from "@/lib/providers/types";
+import { useState, useCallback } from "react";
 
 interface Props {
   movieId: string | null;
@@ -31,7 +32,22 @@ interface Props {
   sessionCode?: string | null;
 }
 
+interface MovieSource {
+  id: number;
+  movieId: string;
+  url: string;
+  type: string;
+  quality: string | null;
+  language: string | null;
+  title: string | null;
+  provider: string;
+  status: string;
+}
+
 export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionCode }: Props) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [activeSourceIndex, setActiveSourceIndex] = useState(0);
+  const [playerError, setPlayerError] = useState<string | null>(null);
   // 1. Create a manual motion value for scroll position
   const scrollY = useMotionValue(0);
 
@@ -89,6 +105,43 @@ export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionC
   const ratingDisplay = typeof movie?.CommunityRating === "number"
     ? (isRottenTomatoes ? Math.round(movie.CommunityRating * 10) : movie.CommunityRating.toFixed(1))
     : null;
+
+  // Fetch playback sources for this movie
+  const { data: sourcesData } = useQuery({
+    queryKey: ["movie-sources", movieId],
+    queryFn: async () => {
+      if (!movieId) return { sources: [] };
+      const res = await apiClient.get<{ sources: MovieSource[] }>(`/api/media/sources?movieId=${movieId}`);
+      return res.data;
+    },
+    enabled: !!movieId,
+  });
+  const activeSources = (sourcesData?.sources || []).filter((s: MovieSource) => s.status === "active");
+
+  const handlePlay = useCallback(() => {
+    if (activeSources.length === 0) return;
+    setPlayerError(null);
+    setActiveSourceIndex(0);
+    setIsPlaying(true);
+  }, [activeSources.length]);
+
+  const handleSourceError = useCallback(() => {
+    // Try next source as fallback
+    if (activeSourceIndex < activeSources.length - 1) {
+      setActiveSourceIndex(prev => prev + 1);
+      setPlayerError(null);
+    } else {
+      setPlayerError("All sources failed to load. Please try again later.");
+    }
+  }, [activeSourceIndex, activeSources.length]);
+
+  const handleStopPlaying = useCallback(() => {
+    setIsPlaying(false);
+    setPlayerError(null);
+    setActiveSourceIndex(0);
+  }, []);
+
+
 
   return (
     <Drawer open={!!movieId} onOpenChange={(open: boolean) => !open && onClose()}>
@@ -214,8 +267,64 @@ export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionC
                   </div>
                 )}
 
+                {/* EMBED PLAYER */}
+                {isPlaying && activeSources.length > 0 && (
+                  <div className="mb-6 -mx-6 -mt-6 relative bg-black">
+                    <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
+                      <iframe
+                        src={activeSources[activeSourceIndex]?.url}
+                        className="w-full h-full border-0"
+                        allowFullScreen
+                        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                        sandbox="allow-scripts allow-same-origin"
+                        referrerPolicy="no-referrer"
+                        onError={handleSourceError}
+                        title={`Player - ${movie.Name}`}
+                      />
+                    </div>
+                    <div className="absolute top-2 right-2 z-10 flex gap-1">
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        className="size-8 rounded-full bg-black/60 hover:bg-black/80 text-white border-0"
+                        onClick={handleStopPlaying}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    {activeSources.length > 1 && (
+                      <div className="absolute bottom-2 left-2 z-10 flex gap-1 flex-wrap">
+                        {activeSources.map((source: MovieSource, idx: number) => (
+                          <Button
+                            key={source.id}
+                            variant={idx === activeSourceIndex ? "default" : "secondary"}
+                            size="sm"
+                            className="h-6 text-[10px] rounded-full bg-black/60 hover:bg-black/80 text-white border-0"
+                            onClick={() => { setActiveSourceIndex(idx); setPlayerError(null); }}
+                          >
+                            {source.title || source.provider} {source.quality ? `(${source.quality})` : ""}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+                    {playerError && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white gap-2 p-4">
+                        <AlertCircle className="w-8 h-8 text-destructive" />
+                        <p className="text-sm text-center">{playerError}</p>
+                        <Button variant="outline" size="sm" onClick={handleStopPlaying} className="text-white border-white/30">
+                          Close
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex gap-2 mb-8 flex-wrap">
-                  {capabilities.requiresServerUrl && !isGuest ? (
+                  {activeSources.length > 0 ? (
+                    <Button className="w-32" size="lg" onClick={handlePlay}>
+                      <Play className="w-4 h-4 mr-2 fill-current" /> Play
+                    </Button>
+                  ) : capabilities.requiresServerUrl && !isGuest ? (
                     <Link href={detailsUrl} className="w-32" target="_blank">
                       <Button className="w-32" size="lg">
                         <Play className="w-4 h-4 mr-2 fill-current" /> Play

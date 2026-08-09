@@ -172,7 +172,7 @@ export default function SessionContent() {
         }
 
         const shareData = {
-            title: 'Swiparr session invite',
+            title: 'Janes Streaming session invite',
             text: `Join with code: ${activeCode}`,
             url: shareUrl
         };

@@ -36,6 +36,7 @@ const envSchema = z.object({
 
   // Provider Specific
   TMDB_ACCESS_TOKEN: z.string().optional(),
+  TMDB_API_KEY: z.string().optional(),
   TMDB_DEFAULT_REGION: z.string().optional(),
   PLEX_TOKEN: z.string().optional(),
 
@@ -59,9 +60,11 @@ const parsedEnv = envSchema.parse(process.env);
 // Calculated values
 const getDefaultDbPath = () => {
   if (parsedEnv.NODE_ENV === 'production') {
-    return 'file:/app/data/swiparr.db';
+    // On Vercel serverless, /tmp is the writable directory
+    // Each cold start gets a fresh FS, so auto-migration will run
+    return 'file:/tmp/janes-streaming.db';
   }
-  return 'file:swiparr.db';
+  return 'file:janes-streaming.db';
 };
 
 const DATABASE_URL = parsedEnv.DATABASE_URL || parsedEnv.TURSO_DATABASE_URL || getDefaultDbPath();

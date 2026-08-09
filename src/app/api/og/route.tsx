@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
       await connection()
     } catch (error) {
       console.warn('[og] connection() failed during prerender.')
-      return renderFallbackImage('Swiparr')
+      return renderFallbackImage('Janes Streaming')
     }
     const { searchParams } = new URL(req.url)
     const join = searchParams.get('join')
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch fonts
     const [sansFont, monoFont] = await Promise.all([
-      loadGoogleFont('Zalando+Sans', 'Swiparr' + (join ? "You're invited to join a session Join a session and start swiping on what to watch next together." : "Swipe on what to watch next, by yourself or together.")),
+      loadGoogleFont('Zalando+Sans', 'Janes Streaming' + (join ? "You're invited to join a session Join a session and start swiping on what to watch next together." : "Swipe on what to watch next, by yourself or together.")),
       loadGoogleFont('JetBrains+Mono', join || 'CODE')
     ])
 
@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
 
           {/* Bold App Name UNDER the logo/emoji */}
           <div tw="text-8xl font-black text-white mb-8" style={{ fontFamily: 'Zalando Sans' }}>
-            Swiparr
+            Janes Streaming
           </div>
 
           {join ? (

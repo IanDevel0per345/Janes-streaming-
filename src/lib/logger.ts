@@ -1,11 +1,11 @@
 import { getRuntimeConfig } from "./runtime-config";
 
 /**
- * Centralized logger for Swiparr.
- * Prefixes all logs with [Swiparr] and handles debug level based on configuration.
+ * Centralized logger for Janes Streaming.
+ * Prefixes all logs with [Janes Streaming] and handles debug level based on configuration.
  */
 
-const PREFIX = "[Swiparr]";
+const PREFIX = "[Janes Streaming]";
 
 const isDebugEnabled = () => {
     try {

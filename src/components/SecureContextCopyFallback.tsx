@@ -37,7 +37,7 @@ export function SecureContextCopyFallback({
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Manual copy required</AlertTitle>
             <AlertDescription className="text-xs">
-              Automatic copy and sharing is disabled because Swiparr is not running in a secure context (HTTPS).
+              Automatic copy and sharing is disabled because Janes Streaming is not running in a secure context (HTTPS).
             </AlertDescription>
           </Alert>
           <div className="space-y-2">

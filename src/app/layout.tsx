@@ -38,32 +38,32 @@ export const viewport: Viewport = {
 export async function generateMetadata(): Promise<Metadata> {
   const { basePath, appPublicUrl } = await getAsyncRuntimeConfig();
   const url = appPublicUrl.startsWith('http') ? appPublicUrl : `https://${appPublicUrl}`;
-  const tagline = "Swipe on what to watch next, by yourself or together.";
+  const tagline = "Seu cinema pessoal — descubra e assista filmes.";
   
   return {
     metadataBase: new URL(url),
     title: {
-      default: "Swiparr",
-      template: "%s | Swiparr"
+      default: "Janes Streaming",
+      template: "%s | Janes Streaming"
     },
     description: tagline,
-    appleWebApp: { capable: true, title: "Swiparr", statusBarStyle: "black-translucent" },
+    appleWebApp: { capable: true, title: "Janes Streaming", statusBarStyle: "black-translucent" },
     icons: {
       icon: `${basePath}/favicon.ico`,     
       shortcut: `${basePath}/icon1.png`,   
       apple: `${basePath}/apple-icon.png`,
     },
     openGraph: {
-      title: "Swiparr – Discover what to watch next",
+      title: "Janes Streaming – Seu cinema pessoal",
       description: tagline,
       url: url,
-      siteName: "Swiparr",
+      siteName: "Janes Streaming",
       locale: "en_US",
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: "Swiparr – Discover what to watch next",
+      title: "Janes Streaming – Seu cinema pessoal",
       description: tagline,
     },
   };

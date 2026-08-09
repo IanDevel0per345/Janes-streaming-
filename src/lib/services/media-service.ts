@@ -60,7 +60,7 @@ export class MediaService {
     }
 
     const { watchProviders, watchRegion } = await this.resolveWatchProviders(session, sessionFilters, auth, activeProviderName);
-    const defaultSort = activeProviderName === ProviderType.TMDB ? "Popular" : "Trending";
+    const defaultSort = activeProviderName === ProviderType.TMDB ? "Trending" : "Trending";
 
     // 3. Handle Search
     if (searchTerm) {

@@ -56,6 +56,7 @@ export async function proxy(request: NextRequest) {
     "font-src 'self' data:",
     "connect-src 'self' https://plex.tv https://*.plex.direct wss://*.plex.direct https://api.themoviedb.org https://image.tmdb.org",
     "media-src 'self' blob:",
+    "frame-src 'self' https://vidsrc.me https://vidsrc.cc https://vidlink.pro https://www.2embed.cc https://multiembed.mov https://*.vidsrc.me https://*.vidsrc.cc https://*.vidlink.pro https://*.2embed.cc https://*.multiembed.mov",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

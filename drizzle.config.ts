@@ -3,9 +3,9 @@ import 'dotenv/config';
 
 const getDefaultDbPath = () => {
   if (process.env.NODE_ENV === 'production') {
-    return 'file:/app/data/swiparr.db';
+    return 'file:/app/data/janes-streaming.db';
   }
-  return 'file:swiparr.db';
+  return 'file:janes-streaming.db';
 };
 
 export default defineConfig({

@@ -1,7 +1,7 @@
 import { PlexPin, PlexPinResponse } from "./pin-auth";
 
 const PLEX_TV_API_URL = 'https://plex.tv/api/v2';
-const CLIENT_ID_KEY = 'swiparr_plex_client_id';
+const CLIENT_ID_KEY = 'janes_streaming_plex_client_id';
 
 /**
  * Generates a UUID v4, with a fallback for non-secure contexts (plain HTTP)
@@ -23,7 +23,7 @@ function generateUUID(): string {
  * Get or create a stable client identifier for Plex
  */
 export function getPlexClientId(): string {
-  if (typeof window === 'undefined') return 'Swiparr-Server';
+  if (typeof window === 'undefined') return 'Janes-Streaming-Server';
   
   let clientId = localStorage.getItem(CLIENT_ID_KEY);
   if (!clientId) {
@@ -36,7 +36,7 @@ export function getPlexClientId(): string {
 function getPlexHeaders(clientId: string) {
   return {
     'X-Plex-Client-Identifier': clientId,
-    'X-Plex-Product': 'Swiparr',
+    'X-Plex-Product': 'Janes Streaming',
     'X-Plex-Version': '1.0.0',
     'X-Plex-Platform': 'Web',
     'X-Plex-Device': 'Web',
@@ -111,7 +111,7 @@ export function buildPlexAuthUrl(pinCode: string): string {
   const params = new URLSearchParams({
     'code': pinCode,
     'clientID': clientId,
-    'context[device][product]': 'Swiparr',
+    'context[device][product]': 'Janes Streaming',
     'context[device][version]': '1.0.0',
     'context[device][platform]': 'Web',
     'context[device][device]': 'Web',

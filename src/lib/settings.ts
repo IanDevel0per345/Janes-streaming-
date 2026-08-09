@@ -35,7 +35,7 @@ export const useSettingsStore = create<SettingsState>()(
       resetSettings: () => set({ settings: getDefaultSettings() }),
     }),
     {
-      name: 'swiparr-settings',
+      name: 'janes-streaming-settings',
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
         if (!state) return;

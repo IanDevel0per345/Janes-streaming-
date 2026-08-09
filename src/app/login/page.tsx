@@ -19,7 +19,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   if (join && typeof join === 'string') {
     const ogUrl = new URL(`${basePath}/api/og`, origin);
     ogUrl.searchParams.set('join', join);
-    const title = "Swiparr – Join session";
+    const title = "Janes Streaming – Join session";
     const description = `You've been invited to join a session with code: ${join}.`;
     return {
       title,
@@ -46,7 +46,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
   return {
     title: "Login",
-    description: "Login to Swiparr to start swiping on what to watch next, by yourself or together.",
+    description: "Login to Janes Streaming to start swiping on what to watch next, by yourself or together.",
   };
 }
 

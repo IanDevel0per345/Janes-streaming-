@@ -2,21 +2,35 @@ import { drizzle } from 'drizzle-orm/libsql';
 import { migrate } from 'drizzle-orm/libsql/migrator';
 import { createClient } from '@libsql/client';
 import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const getDefaultDbPath = () => {
   if (process.env.NODE_ENV === 'production') {
-    return 'file:/app/data/swiparr.db';
+    // On Vercel serverless, /tmp is the writable directory
+    if (process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL?.startsWith('libsql://')) {
+      return process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL;
+    }
+    const dbDir = '/tmp';
+    try { fs.mkdirSync(dbDir, { recursive: true }); } catch {}
+    return `file:${dbDir}/janes-streaming.db`;
   }
-  return 'file:swiparr.db';
+  return 'file:janes-streaming.db';
 };
 
 const url = process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || getDefaultDbPath();
 const authToken = process.env.DATABASE_AUTH_TOKEN || process.env.TURSO_AUTH_TOKEN;
 
-console.log('Connecting to database at:', url.split('@').pop()); // Hide token if present
+console.log('Connecting to database at:', url.includes('@') ? url.split('@').pop() : url.replace(/^file:/, 'file:***'));
+
+// For local file databases, ensure the directory exists
+if (url.startsWith('file:')) {
+  const dbPath = url.replace('file:', '');
+  const dbDir = path.dirname(dbPath);
+  try { fs.mkdirSync(dbDir, { recursive: true }); } catch {}
+}
 
 const client = createClient({
   url,
@@ -26,20 +40,16 @@ const client = createClient({
 const db = drizzle(client);
 
 async function wipeLegacyCryptoTokens() {
-  // Security upgrade (C3/M8): v1 tokens were encrypted with a raw SHA-256-derived
-  // key. They must be wiped so hosts re-encrypt under the new scrypt KDF (v2).
   try {
     const result = await client.execute(
       "UPDATE Session SET hostAccessToken = NULL, hostDeviceId = NULL WHERE hostAccessToken LIKE 'v1:%'"
     );
     if (result.rowsAffected > 0) {
       console.log(
-        `[Security] Wiped ${result.rowsAffected} legacy v1-encrypted guest-lending token(s). ` +
-        'Hosts will need to re-enable guest lending to re-encrypt under the new KDF.'
+        `[Security] Wiped ${result.rowsAffected} legacy v1-encrypted guest-lending token(s).`
       );
     }
   } catch (error) {
-    // Non-fatal: table may not exist yet on a fresh install
     console.warn('[Security] Could not wipe legacy tokens (safe to ignore on fresh install):', error.message);
   }
 }

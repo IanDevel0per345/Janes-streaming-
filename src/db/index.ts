@@ -1,11 +1,43 @@
 import { drizzle } from 'drizzle-orm/libsql';
+import { migrate } from 'drizzle-orm/libsql/migrator';
 import { createClient } from '@libsql/client';
 import * as schema from './schema';
 import { config } from '@/lib/config';
+import path from 'path';
 
 // Initialize variables as null
 let client: any = null;
 let dbInstance: any = null;
+let migrationPromise: Promise<void> | null = null;
+
+async function ensureMigrated() {
+  if (migrationPromise) return migrationPromise;
+
+  migrationPromise = (async () => {
+    try {
+      // Check if the Config table exists (quick check for migration state)
+      const result = await client.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='Config' LIMIT 1");
+      if (result.rows.length > 0) {
+        // Tables exist, check if migration journal exists too
+        const journalResult = await client.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='__drizzle_migrations' LIMIT 1");
+        if (journalResult.rows.length > 0) {
+          return; // Already migrated
+        }
+      }
+      
+      // Run migrations — DB is empty or missing tables
+      console.log('[DB] Tables missing, running auto-migration...');
+      const migrationsFolder = path.join(process.cwd(), 'src', 'db', 'migrations');
+      await migrate(dbInstance, { migrationsFolder });
+      console.log('[DB] Auto-migration complete!');
+    } catch (error: any) {
+      console.error('[DB] Auto-migration failed:', error?.message || error);
+      // Don't throw — let the app try to continue, some queries may still work
+    }
+  })();
+
+  return migrationPromise;
+}
 
 export function getDb() {
   if (dbInstance) return dbInstance;
@@ -35,6 +67,17 @@ export function getDb() {
   return dbInstance;
 }
 
+/**
+ * Call this before any DB operation to ensure migrations have run.
+ * In Vercel serverless, each cold start gets a fresh empty DB, so we
+ * need to auto-migrate before the first query.
+ */
+export async function getDbReady() {
+  getDb(); // ensure initialized
+  await ensureMigrated();
+  return dbInstance;
+}
+
 // Keep the export for compatibility, but make it a proxy or getter
 export const db = new Proxy({} as any, {
   get(_, prop) {
@@ -43,3 +86,7 @@ export const db = new Proxy({} as any, {
 });
 
 export { client };
+
+// Re-export all schema tables and types for convenience
+export { sessions, likes, hiddens, sessionMembers, config, userProfiles, sessionEvents, movieSources } from './schema';
+export type { Session, NewSession, Like, NewLike, Hidden, NewHidden, SessionMember, NewSessionMember, Config, NewConfig, UserProfile, NewUserProfile, SessionEvent, NewSessionEvent, MovieSource, NewMovieSource } from './schema';

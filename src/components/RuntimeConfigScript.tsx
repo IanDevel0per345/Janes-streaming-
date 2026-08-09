@@ -8,7 +8,7 @@ export async function RuntimeConfigScript() {
     <script
       dangerouslySetInnerHTML={{
         __html: `
-          window.__SWIPARR_CONFIG__ = ${JSON.stringify(config)};
+          window.__JANES_STREAMING_CONFIG__ = ${JSON.stringify(config)};
         `,
       }}
     />

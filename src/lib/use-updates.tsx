@@ -10,7 +10,7 @@ import { useSession, QUERY_KEYS } from '@/hooks/api';
 import { usePathname, useRouter } from 'next/navigation';
 import { logger } from './logger';
 
-const LEADER_CHANNEL = 'swiparr:sse-leader';
+const LEADER_CHANNEL = 'janes-streaming:sse-leader';
 const LEADER_HEARTBEAT_MS = 3000;
 const LEADER_TIMEOUT_MS = 9000;
 

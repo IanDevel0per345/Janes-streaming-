@@ -34,7 +34,7 @@ export function UserGuide({ open, onOpenChange }: UserGuideProps) {
             <DrawerContent>
                 <DrawerHeader className="border-b">
                     <DrawerTitle>User guide</DrawerTitle>
-                    <DrawerDescription>Learn how to use Swiparr</DrawerDescription>
+                    <DrawerDescription>Learn how to use Janes Streaming</DrawerDescription>
                 </DrawerHeader>
                 <div className="px-6 py-4">
                     <Tabs defaultValue="basics" className="w-full">

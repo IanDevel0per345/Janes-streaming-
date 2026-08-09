@@ -93,7 +93,7 @@ export class EmbyProvider implements MediaProvider {
 
     const res = await apiClient.get(getEmbyUrl(`/Users/${auth?.userId}/Items`, auth?.serverUrl), {
       params,
-      headers: auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Swiparr") : {},
+      headers: auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Janes Streaming") : {},
     });
 
     const data = JellyfinQueryResultSchema.parse(res.data);
@@ -103,7 +103,7 @@ export class EmbyProvider implements MediaProvider {
 
   async getItemDetails(id: string, auth?: AuthContext, _options?: { includeUserState?: boolean }): Promise<MediaItem> {
     const res = await apiClient.get(getEmbyUrl(`/Users/${auth?.userId}/Items/${id}`, auth?.serverUrl), {
-      headers: auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Swiparr") : {},
+      headers: auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Janes Streaming") : {},
     });
     const data = JellyfinItemSchema.parse(res.data);
     return this.mapToMediaItem(data);
@@ -130,7 +130,7 @@ export class EmbyProvider implements MediaProvider {
         includeItemTypes: "Movie",
         recursive: true,
       },
-      headers: auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Swiparr") : {},
+      headers: auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Janes Streaming") : {},
     });
 
     // The response contains a Tags array directly
@@ -198,7 +198,7 @@ export class EmbyProvider implements MediaProvider {
     const { getBlurDataURL } = await import("@/lib/server/image-blur");
     try {
         const imageUrl = this.getImageUrl(itemId, (type || "Primary") as any, undefined, auth) + "?maxWidth=20&quality=50";
-        const headers = auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Swiparr") : {};
+        const headers = auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Janes Streaming") : {};
         return await getBlurDataURL(itemId, imageUrl, headers) || "";
     } catch (e) {
         return "";
@@ -207,7 +207,7 @@ export class EmbyProvider implements MediaProvider {
 
   async fetchImage(itemId: string, type: string, tag?: string, auth?: AuthContext, options?: Record<string, string>): Promise<ImageResponse> {
     const url = this.getImageUrl(itemId, type as any, tag, auth);
-    const headers = auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Swiparr") : {};
+    const headers = auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Janes Streaming") : {};
     const res = await apiClient.get(url, {
       responseType: "arraybuffer",
       headers,
@@ -221,20 +221,20 @@ export class EmbyProvider implements MediaProvider {
 
   async authenticate(username: string, password?: string, deviceId?: string, serverUrl?: string): Promise<any> {
     const { authenticateEmby } = await import("@/lib/emby/api");
-    return authenticateEmby(username, password || "", deviceId || "Swiparr", serverUrl);
+    return authenticateEmby(username, password || "", deviceId || "Janes Streaming", serverUrl);
   }
 
   async toggleWatchlist(itemId: string, action: "add" | "remove", auth?: AuthContext): Promise<void> {
     const url = getEmbyUrl(`/Users/${auth?.userId}/Items/${itemId}/Rating`, auth?.serverUrl);
     await apiClient.post(url, null, { 
       params: { Likes: action === "add" },
-      headers: auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Swiparr") : {}
+      headers: auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Janes Streaming") : {}
     });
   }
 
   async toggleFavorite(itemId: string, action: "add" | "remove", auth?: AuthContext): Promise<void> {
     const url = getEmbyUrl(`/Users/${auth?.userId}/FavoriteItems/${itemId}`, auth?.serverUrl);
-    const headers = auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Swiparr") : {};
+    const headers = auth?.accessToken ? getAuthenticatedHeaders(auth.accessToken, auth.deviceId || "Janes Streaming") : {};
     if (action === "add") {
       await apiClient.post(url, null, { headers });
     } else {

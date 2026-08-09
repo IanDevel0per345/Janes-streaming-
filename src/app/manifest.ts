@@ -5,8 +5,8 @@ export default function manifest(): MetadataRoute.Manifest {
   const { basePath } = getRuntimeConfig();
   
   return {
-    name: 'Swiparr',
-    short_name: 'Swiparr',
+    name: 'Janes Streaming',
+    short_name: 'Janes Streaming',
     description: 'Swipe on what to watch next, by yourself or together.',
     start_url: `${basePath}/`,
     display: 'standalone',

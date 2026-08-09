@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
 import { connection } from 'next/server'
 import { getRuntimeConfig } from '@/lib/runtime-config'
 
-export const alt = 'Swiparr - Swipe on what to watch next'
+export const alt = 'Janes Streaming - Swipe on what to watch next'
 export const size = {
   width: 1200,
   height: 630,
@@ -45,13 +45,13 @@ export default async function Image() {
       await connection()
     } catch (error) {
       console.warn('[opengraph-image] connection() failed during prerender.')
-      return renderFallbackImage('Swiparr')
+      return renderFallbackImage('Janes Streaming')
     }
     const { basePath, appPublicUrl } = getRuntimeConfig();
     const origin = appPublicUrl.startsWith('http') ? appPublicUrl : `https://${appPublicUrl}`;
     const logoUrl = `${origin}${basePath}/icon1.png`;
 
-    const text = "Swiparr Swipe on what to watch next, by yourself or together."
+    const text = "Janes Streaming Swipe on what to watch next, by yourself or together."
     const sansFont = await loadGoogleFont('Zalando+Sans', text)
 
     return new ImageResponse(
@@ -63,7 +63,7 @@ export default async function Image() {
           <div tw="flex items-center mb-4">
             <img 
               src={logoUrl} 
-              alt="Swiparr Logo" 
+              alt="Janes Streaming Logo" 
               tw="w-32 h-32 rounded-[30px]"
             />
             <span tw="text-8xl ml-8 flex">🍿</span>
@@ -71,7 +71,7 @@ export default async function Image() {
 
           {/* App Name under logo/emoji */}
           <div tw="text-8xl text-white mb-8" style={{ fontFamily: 'Zalando Sans' }}>
-            Swiparr
+            Janes Streaming
           </div>
 
           <div tw="text-4xl text-[#a0a0a0] text-center max-w-4xl leading-relaxed">

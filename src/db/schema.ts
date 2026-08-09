@@ -109,3 +109,31 @@ export const sessionEvents = sqliteTable("SessionEvent", {
 
 export type SessionEvent = InferSelectModel<typeof sessionEvents>;
 export type NewSessionEvent = InferInsertModel<typeof sessionEvents>;
+
+/**
+ * Movie Sources — authorized playback/embed URLs for each movie
+ * Each movie can have multiple sources (different providers, qualities, languages)
+ */
+export const movieSources = sqliteTable("MovieSource", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  movieId: text("movieId").notNull(),
+  url: text("url").notNull(),
+  type: text("type").notNull().default("embed"), // "embed", "direct", "hls", "dash"
+  quality: text("quality"), // "720p", "1080p", "4k", "unknown"
+  language: text("language"), // Audio/subtitle language tag (e.g., "pt-BR", "en")
+  title: text("title"), // Display title for this source
+  provider: text("provider").notNull(), // Scraper/provider name that added this source
+  status: text("status").notNull().default("active"), // "active", "inactive", "broken"
+  addedAt: text("addedAt").notNull().default(sql`CURRENT_TIMESTAMP`),
+  lastCheckedAt: text("lastCheckedAt"),
+}, (table) => {
+  return [
+    index("MovieSource_movieId_idx").on(table.movieId),
+    index("MovieSource_provider_idx").on(table.provider),
+    index("MovieSource_status_idx").on(table.status),
+    uniqueIndex("MovieSource_movieId_url_key").on(table.movieId, table.url),
+  ];
+});
+
+export type MovieSource = InferSelectModel<typeof movieSources>;
+export type NewMovieSource = InferInsertModel<typeof movieSources>;

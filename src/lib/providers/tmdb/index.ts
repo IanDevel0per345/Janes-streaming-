@@ -45,10 +45,21 @@ export class TmdbProvider implements MediaProvider {
   };
 
   constructor(token?: string) {
-    this.apiKey = token || appConfig.TMDB_ACCESS_TOKEN || '';
+    // Support both v4 access token (Bearer) and v3 API key
+    this.apiKey = token || appConfig.TMDB_ACCESS_TOKEN || appConfig.TMDB_API_KEY || '';
   }
 
   private async fetchTmdb<T>(path: string, params: Record<string, any> = {}): Promise<T> {
+    // If we have a v3 API key (32-char hex), use api_key param instead of Bearer
+    const isV3ApiKey = this.apiKey.length === 32 && /^[a-f0-9]+$/i.test(this.apiKey);
+    
+    if (isV3ApiKey) {
+      const res = await axios.get(`https://api.themoviedb.org/3/${path.replace(/^\//, '')}`, {
+        params: { ...params, api_key: this.apiKey }
+      });
+      return res.data;
+    }
+
     const res = await axios.get(`https://api.themoviedb.org/3/${path.replace(/^\//, '')}`, {
       headers: {
         Authorization: `Bearer ${this.apiKey}`,

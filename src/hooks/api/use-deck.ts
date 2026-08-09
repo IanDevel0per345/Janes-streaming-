@@ -15,7 +15,7 @@ export function useDeck() {
       const res = await apiClient.get<{ items: MediaItem[]; hasMore: boolean }>("/api/media/items", {
         params: {
           page: pageParam,
-          limit: 20,
+          limit: 40,
           filters: filters ? JSON.stringify(filters) : undefined,
         },
       });
