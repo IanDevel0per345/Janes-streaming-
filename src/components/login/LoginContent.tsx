@@ -7,7 +7,7 @@ import { useQuickConnectUpdates } from "@/lib/use-updates";
 import { usePlexPinAuth } from "@/hooks/usePlexPinAuth";
 import Image from "next/image";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import logo from "../../../public/icon0.svg"
+import logo from "../../../public/icon1.png"
 import { apiClient } from "@/lib/api-client";
 import { cn, getErrorMessage } from "@/lib/utils";
 import { useRuntimeConfig } from "@/lib/runtime-config";
