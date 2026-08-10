@@ -31,7 +31,7 @@ export default function Home() {
         <Tabs
           value={tab}
           onValueChange={setTab}
-          className="w-full"
+          className="w-full flex-1 min-h-0"
         >
           <div className="w-full max-w-7xl mx-auto px-4 mt-1">
             <TabsList className="grid mx-auto h-fit w-fit grid-cols-3 bg-muted/30 rounded-full z-0">
