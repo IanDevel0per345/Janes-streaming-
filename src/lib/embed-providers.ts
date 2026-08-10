@@ -2,7 +2,11 @@
  * Embed Providers Configuration
  * 
  * VidSrc is the primary provider for all movies.
- * Fallback chain uses only reliable VidSrc variants to avoid ad/popup redirects.
+ * Uses ONLY official VidSrc domains from vidsrc.domains to ensure
+ * safety and avoid fake/ad-injected clones.
+ * 
+ * Last verified: Active domains checked via curl (HTTP 200).
+ * Official source: https://vidsrc.domains
  */
 
 export interface EmbedProvider {
@@ -31,41 +35,49 @@ export const LANGUAGE_OPTIONS: LanguageOption[] = [
 ];
 
 /**
- * VidSrc is the primary provider. Only reliable VidSrc variants
- * are used to prevent ad/popup redirects from sketchy hosts.
+ * Official VidSrc domains (verified active from vidsrc.domains).
+ * vidsrc.cc and vidsrc.to are DEAD — do NOT use them.
  */
 export const EMBED_PROVIDERS: EmbedProvider[] = [
-  // 1. VidSrc.cc — PRIMARY, most reliable, clean player
+  // 1. VidSrc2.ru — PRIMARY official domain
   {
-    name: "vidsrc-cc",
+    name: "vidsrc2-ru",
     label: "VidSrc",
     priority: 1,
-    getUrl: (tmdbId) => `https://vidsrc.cc/embed/movie/${tmdbId}`,
+    getUrl: (tmdbId) => `https://vidsrc2.ru/embed/movie/${tmdbId}`,
     languages: ["dub", "sub", "original"],
   },
-  // 2. VidSrc.to — backup VidSrc
+  // 2. VidSrcMe.ru — official backup
   {
-    name: "vidsrc-to",
-    label: "VidSrc.to",
+    name: "vidsrcme-ru",
+    label: "VidSrc.me.ru",
     priority: 2,
-    getUrl: (tmdbId) => `https://vidsrc.to/embed/movie/${tmdbId}`,
+    getUrl: (tmdbId) => `https://vidsrcme.ru/embed/movie/${tmdbId}`,
     languages: ["dub", "sub", "original"],
   },
-  // 3. VidSrc.me — alternate VidSrc
+  // 3. VidSrcMe.su — official backup
   {
-    name: "vidsrc-me",
-    label: "VidSrc.me",
+    name: "vidsrcme-su",
+    label: "VidSrc.me.su",
     priority: 3,
-    getUrl: (tmdbId) => `https://vidsrc.me/embed/tmdb/${tmdbId}`,
+    getUrl: (tmdbId) => `https://vidsrcme.su/embed/movie/${tmdbId}`,
     languages: ["dub", "sub", "original"],
   },
-  // 4. VidSrc.xyz — another reliable variant
+  // 4. VidSrc-Me.ru — official backup
   {
-    name: "vidsrc-xyz",
-    label: "VidSrc.xyz",
+    name: "vidsrc-me-ru",
+    label: "VidSrc-Me.ru",
     priority: 4,
-    getUrl: (tmdbId) => `https://vidsrc.xyz/embed/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
+    getUrl: (tmdbId) => `https://vidsrc-me.ru/embed/movie/${tmdbId}`,
+    languages: ["dub", "sub", "original"],
+  },
+  // 5. VidSrc.io — old but still working
+  {
+    name: "vidsrc-io",
+    label: "VidSrc.io",
+    priority: 5,
+    getUrl: (tmdbId) => `https://vidsrc.io/embed/movie/${tmdbId}`,
+    languages: ["dub", "sub", "original"],
   },
 ];
 
