@@ -27,9 +27,9 @@ export function LikesList() {
     const { data: likes, isLoading } = useLikes(sortBy, filterMode);
 
     return (
-        <div className="relative w-full mx-auto h-[calc(100svh-115px)] flex flex-col">
+        <div className="relative w-full h-full flex flex-col px-4 md:px-6 lg:px-8">
             {/* Header w/ Filter */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mt-3 mb-2">
                 <h2 className="text-sm text-muted-foreground font-medium">Showing <span className="font-mono">{isLoading ? '_' : likes?.length || 0}</span> {likes?.length == 1 ? 'like' : 'likes'}</h2>
                 <LikesFilter
                     sortBy={sortBy}
@@ -40,7 +40,7 @@ export function LikesList() {
             </div>
 
             {/* List Content */}
-            <ScrollArea className="flex-1 h-[calc(100svh-155px)] -mr-5 pr-5">
+            <ScrollArea className="flex-1">
                 {isLoading && <LikesSkeleton />}
 
                 {!isLoading && likes?.length === 0 && (
@@ -59,7 +59,7 @@ export function LikesList() {
                         </Empty>
                     </div>
                 )}
-                <div className="mt-7 mb-14">
+                <div className="mt-4 mb-14 max-w-3xl">
                 {likes?.map((movie: MergedLike) => (
                     <MovieListItem
                         key={`${movie.Id}-${movie.sessionCode ?? 'solo'}`}
@@ -81,7 +81,7 @@ export function LikesList() {
 
 function LikesSkeleton() {
     return (
-        <div className="space-y-4 mt-5">
+        <div className="space-y-4 mt-5 max-w-3xl">
             {[1, 2, 3].map(i => (
                 <div key={i} className="flex gap-4 p-3">
                     <Skeleton className="w-20 h-28 rounded-md" />

@@ -4,16 +4,14 @@ import { SessionManager } from "@/components/session/SessionManager";
 import { LikesList } from "@/components/likes/LikesList";
 import { CatalogList } from "@/components/catalog/CatalogList";
 import { GalleryHorizontalEnd, Heart, LayoutGrid } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/animate-ui/components/animate/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/animate-ui/components/animate/tabs";
 import { SettingsSidebar } from "@/components/home/SettingsSidebar";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { TabsContents } from "@/components/animate-ui/primitives/animate/tabs";
-import { cn } from "@/lib/utils";
 import { DynamicBackground } from "@/components/deck/DynamicBackground";
+import { AnimatePresence, motion } from "motion/react";
 
 export default function Home() {
-
   const [tab, setTab] = useState("swipe");
 
   useHotkeys("1", () => setTab("swipe"), []);
@@ -23,49 +21,85 @@ export default function Home() {
   return (
     <main className="overflow-hidden h-full pt-[env(safe-area-inset-top)] font-sans">
       <DynamicBackground show={tab === "swipe"} />
-      <div className="grid justify-center my-[3svh] relative">
+      <div className="h-full flex flex-col">
 
-        <div className="w-full mt-2 md:max-w-md min-w-0 relative">
+        {/* Top bar: session + settings icons */}
+        <div className="w-full max-w-7xl mx-auto mt-2 min-w-0 relative px-4">
           <SessionManager />
           <SettingsSidebar />
         </div>
 
+        {/* Tab navigation bar */}
         <Tabs
           value={tab}
           onValueChange={setTab}
-          className="gap-0 w-full sm:max-w-md min-w-0 -mt-1.5"
+          className="w-full"
         >
-          <TabsList className="grid mx-auto h-fit grid-cols-3 bg-muted/30 rounded-full z-0">
-            <TabsTrigger value="swipe" className="h-11 w-14 group rounded-full z-0">
-              <GalleryHorizontalEnd
-                className="size-5 z-0 text-foreground fill-none transition-all group-data-[state=active]:fill-foreground"
-              />
-            </TabsTrigger>
+          <div className="w-full max-w-7xl mx-auto px-4 mt-1">
+            <TabsList className="grid mx-auto h-fit w-fit grid-cols-3 bg-muted/30 rounded-full z-0">
+              <TabsTrigger value="swipe" className="h-11 w-14 group rounded-full z-0">
+                <GalleryHorizontalEnd
+                  className="size-5 z-0 text-foreground fill-none transition-all group-data-[state=active]:fill-foreground"
+                />
+              </TabsTrigger>
 
-            <TabsTrigger value="catalog" className="h-11 w-14 group rounded-full z-0">
-              <LayoutGrid
-                className="size-5 z-0 text-foreground fill-none transition-all group-data-[state=active]:fill-foreground"
-              />
-            </TabsTrigger>
+              <TabsTrigger value="catalog" className="h-11 w-14 group rounded-full z-0">
+                <LayoutGrid
+                  className="size-5 z-0 text-foreground fill-none transition-all group-data-[state=active]:fill-foreground"
+                />
+              </TabsTrigger>
 
-            <TabsTrigger value="likes" className="h-11 w-14 group rounded-full z-0">
-              <Heart
-                className="size-5 z-0 text-foreground fill-none transition-all group-data-[state=active]:fill-foreground"
-              />
-            </TabsTrigger>
-          </TabsList>
+              <TabsTrigger value="likes" className="h-11 w-14 group rounded-full z-0">
+                <Heart
+                  className="size-5 z-0 text-foreground fill-none transition-all group-data-[state=active]:fill-foreground"
+                />
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContents className="grid max-h-screen">
-            <TabsContent value="swipe" className={cn("h-full px-6 outline-none mt-1 w-full sm:max-w-md min-w-0 transition-opacity duration ease-in-out opacity-100", tab != "swipe" && "opacity-0")}>
-              <CardDeck />
-            </TabsContent>
-            <TabsContent value="catalog" className={cn("h-full px-6 outline-none mt-4 w-full sm:max-w-md min-w-0 transition-opacity duration ease-in-out opacity-100", tab != "catalog" && "opacity-0")}>
-              <CatalogList />
-            </TabsContent>
-            <TabsContent value="likes" className={cn("h-full px-6 outline-none mt-4 w-full sm:max-w-md min-w-0 transition-opacity duration ease-in-out opacity-100", tab != "likes" && "opacity-0")}>
-              <LikesList />
-            </TabsContent>
-          </TabsContents>
+          {/* Tab content — no sliding, simple show/hide with fade */}
+          <div className="flex-1 overflow-hidden">
+            <AnimatePresence mode="wait">
+              {tab === "swipe" && (
+                <motion.div
+                  key="swipe"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="h-full flex justify-center"
+                >
+                  <div className="w-full max-w-md h-full px-4">
+                    <CardDeck />
+                  </div>
+                </motion.div>
+              )}
+              {tab === "catalog" && (
+                <motion.div
+                  key="catalog"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="h-full"
+                >
+                  <CatalogList />
+                </motion.div>
+              )}
+              {tab === "likes" && (
+                <motion.div
+                  key="likes"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="h-full"
+                >
+                  <LikesList />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </Tabs>
       </div>
     </main>

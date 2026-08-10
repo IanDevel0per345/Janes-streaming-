@@ -103,17 +103,17 @@ export function CatalogList() {
   const displayItems = hasSearched ? results : trending;
 
   return (
-    <div className="relative w-full mx-auto h-[calc(100svh-115px)] flex flex-col">
+    <div className="relative w-full h-full flex flex-col px-4 md:px-6 lg:px-8">
       {/* Search Bar */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+      <div className="flex items-center gap-2 mb-4 mt-3">
+        <div className="relative w-full max-w-2xl">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Buscar filmes..."
             value={searchTerm}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="pl-9 pr-9 h-10 bg-muted/40 border-border/50 rounded-full text-sm"
+            className="pl-10 pr-9 h-10 bg-muted/40 border-border/50 rounded-full text-sm"
           />
           {searchTerm && (
             <button
@@ -143,7 +143,7 @@ export function CatalogList() {
       )}
 
       {/* Content Grid */}
-      <ScrollArea className="flex-1 h-[calc(100svh-175px)] -mr-5 pr-5">
+      <ScrollArea className="flex-1">
         {isLoading && page === 0 && <CatalogSkeleton />}
         {!hasSearched && trendingLoading && <CatalogSkeleton />}
 
@@ -162,7 +162,7 @@ export function CatalogList() {
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-3 mb-14">
+        <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 mb-14">
           {displayItems.map((movie) => (
             <CatalogCard
               key={movie.Id}
@@ -215,7 +215,7 @@ function CatalogCard({ movie, onClick }: { movie: MediaItem; onClick: () => void
           width={200}
           blurDataURL={movie.BlurDataURL}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          sizes="33vw"
+          sizes="(max-width: 640px) 33vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
         />
         {ratingDisplay !== null && (
           <div className="absolute top-1.5 left-1.5 bg-black/70 backdrop-blur-sm rounded-md px-1.5 py-0.5 flex items-center gap-0.5">
@@ -256,8 +256,8 @@ function CatalogCard({ movie, onClick }: { movie: MediaItem; onClick: () => void
 
 function CatalogSkeleton() {
   return (
-    <div className="grid grid-cols-3 gap-3">
-      {Array.from({ length: 9 }).map((_, i) => (
+    <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+      {Array.from({ length: 12 }).map((_, i) => (
         <div key={i} className="flex flex-col gap-1.5">
           <Skeleton className="aspect-[2/3] rounded-lg" />
           <Skeleton className="h-3 w-3/4" />
