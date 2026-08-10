@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMovieDetail } from "../movie/MovieDetailProvider";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -11,6 +10,8 @@ import { Search, X, Star, Clock, Film } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ticksToTime } from "@/lib/utils";
+
+const PAGE_SIZE = 40;
 
 export function CatalogList() {
   const { openMovie } = useMovieDetail();
@@ -23,15 +24,24 @@ export function CatalogList() {
   const [hasMore, setHasMore] = useState(true);
   const [trending, setTrending] = useState<MediaItem[]>([]);
   const [trendingLoading, setTrendingLoading] = useState(false);
+  const [trendingPage, setTrendingPage] = useState(1);
+  const [trendingHasMore, setTrendingHasMore] = useState(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load trending on mount
-  const loadTrending = useCallback(async () => {
-    if (trendingLoading || trending.length > 0) return;
+  const loadTrending = useCallback(async (pageNum: number = 0) => {
+    if (trendingLoading) return;
+    if (pageNum === 0 && trending.length > 0) return;
     setTrendingLoading(true);
     try {
-      const res = await apiClient.get<{ items: MediaItem[]; totalCount: number }>("/api/media/items?page=0&limit=20");
-      setTrending(res.data.items || []);
+      const res = await apiClient.get<{ items: MediaItem[]; totalCount: number }>(`/api/media/items?page=${pageNum}&limit=${PAGE_SIZE}`);
+      const items = res.data.items || [];
+      if (pageNum === 0) {
+        setTrending(items);
+      } else {
+        setTrending(prev => [...prev, ...items]);
+      }
+      setTrendingHasMore(items.length >= PAGE_SIZE);
     } catch {
       // ignore
     } finally {
@@ -40,7 +50,7 @@ export function CatalogList() {
   }, [trendingLoading, trending.length]);
 
   if (!hasSearched && trending.length === 0 && !trendingLoading) {
-    loadTrending();
+    loadTrending(0);
   }
 
   const search = useCallback(async (term: string, pageNum: number = 0) => {
@@ -48,7 +58,7 @@ export function CatalogList() {
     setIsLoading(true);
     try {
       const res = await apiClient.get<{ items: MediaItem[]; totalCount: number }>(
-        `/api/media/items?searchTerm=${encodeURIComponent(term)}&page=${pageNum}&limit=20`
+        `/api/media/items?searchTerm=${encodeURIComponent(term)}&page=${pageNum}&limit=${PAGE_SIZE}`
       );
       const items = res.data.items || [];
       if (pageNum === 0) {
@@ -56,7 +66,7 @@ export function CatalogList() {
       } else {
         setResults(prev => [...prev, ...items]);
       }
-      setHasMore(items.length >= 20);
+      setHasMore(items.length >= PAGE_SIZE);
     } catch {
       // ignore
     } finally {
@@ -93,11 +103,18 @@ export function CatalogList() {
     setHasMore(true);
   };
 
-  const loadMore = () => {
+  const loadMoreSearch = () => {
     if (isLoading || !hasMore) return;
     const nextPage = page + 1;
     setPage(nextPage);
     search(debouncedTerm, nextPage);
+  };
+
+  const loadMoreTrending = () => {
+    if (trendingLoading || !trendingHasMore) return;
+    const nextPage = trendingPage + 1;
+    setTrendingPage(nextPage);
+    loadTrending(nextPage);
   };
 
   const displayItems = hasSearched ? results : trending;
@@ -105,7 +122,7 @@ export function CatalogList() {
   return (
     <div className="relative w-full h-full flex flex-col px-4 md:px-6 lg:px-8">
       {/* Search Bar */}
-      <div className="flex items-center gap-2 mb-4 mt-3">
+      <div className="flex items-center gap-2 mb-4 mt-3 shrink-0">
         <div className="relative w-full max-w-2xl">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
@@ -128,13 +145,13 @@ export function CatalogList() {
 
       {/* Section Title */}
       {!hasSearched && (
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3 shrink-0">
           <Film className="size-4 text-muted-foreground" />
           <h2 className="text-sm text-muted-foreground font-medium">Em destaque</h2>
         </div>
       )}
       {hasSearched && debouncedTerm && !isLoading && (
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-3 shrink-0">
           <Search className="size-4 text-muted-foreground" />
           <h2 className="text-sm text-muted-foreground font-medium">
             Resultados para &ldquo;{debouncedTerm}&rdquo; <span className="font-mono">({displayItems.length})</span>
@@ -142,10 +159,10 @@ export function CatalogList() {
         </div>
       )}
 
-      {/* Content Grid */}
-      <ScrollArea className="flex-1">
+      {/* Content Grid - plain div with overflow-y-auto instead of ScrollArea */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
         {isLoading && page === 0 && <CatalogSkeleton />}
-        {!hasSearched && trendingLoading && <CatalogSkeleton />}
+        {!hasSearched && trendingLoading && trendingPage === 0 && <CatalogSkeleton />}
 
         {!hasSearched && !trendingLoading && trending.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
@@ -172,13 +189,13 @@ export function CatalogList() {
           ))}
         </div>
 
-        {/* Load More */}
+        {/* Load More - Search */}
         {hasSearched && hasMore && displayItems.length > 0 && (
           <div className="flex justify-center pb-6">
             <Button
               variant="outline"
               size="sm"
-              onClick={loadMore}
+              onClick={loadMoreSearch}
               disabled={isLoading}
               className="rounded-full text-xs"
             >
@@ -186,7 +203,22 @@ export function CatalogList() {
             </Button>
           </div>
         )}
-      </ScrollArea>
+
+        {/* Load More - Trending */}
+        {!hasSearched && trendingHasMore && trending.length > 0 && (
+          <div className="flex justify-center pb-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadMoreTrending}
+              disabled={trendingLoading}
+              className="rounded-full text-xs"
+            >
+              {trendingLoading ? "Carregando..." : "Carregar mais"}
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

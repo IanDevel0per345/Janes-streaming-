@@ -33,18 +33,18 @@ export const LANGUAGE_OPTIONS: LanguageOption[] = [
 
 /**
  * Complete provider list in priority order.
- * VidSrc (vidsrc.to) is PRIMARY.
+ * Most reliable providers first.
  */
 export const EMBED_PROVIDERS: EmbedProvider[] = [
-  // 1. VidSrc (vidsrc.to) — PRINCIPAL
+  // 1. 2Embed (2embed.cc) — very reliable, has Portuguese content
   {
-    name: "vidsrc-to",
-    label: "VidSrc",
+    name: "2embed",
+    label: "2Embed",
     priority: 1,
-    getUrl: (tmdbId) => `https://vidsrc.to/embed/movie/${tmdbId}`,
-    languages: ["dub", "sub", "original"],
+    getUrl: (tmdbId) => `https://www.2embed.cc/embed/tmdb/${tmdbId}`,
+    languages: ["dub", "sub"],
   },
-  // 2. VidSrc (vidsrc.me)
+  // 2. VidSrc (vidsrc.me) — reliable alternative
   {
     name: "vidsrc-me",
     label: "VidSrc.me",
@@ -52,92 +52,92 @@ export const EMBED_PROVIDERS: EmbedProvider[] = [
     getUrl: (tmdbId) => `https://vidsrc.me/embed/tmdb/${tmdbId}`,
     languages: ["dub", "sub", "original"],
   },
-  // 3. Vidsrc.xyz (Embedder)
+  // 3. VidSrc (vidsrc.to) — kept as option
   {
-    name: "vidsrc-xyz",
-    label: "VidSrc.xyz",
+    name: "vidsrc-to",
+    label: "VidSrc",
     priority: 3,
-    getUrl: (tmdbId) => `https://vidsrc.xyz/embed/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
+    getUrl: (tmdbId) => `https://vidsrc.to/embed/movie/${tmdbId}`,
+    languages: ["dub", "sub", "original"],
   },
-  // 4. 2Embed
-  {
-    name: "2embed",
-    label: "2Embed",
-    priority: 4,
-    getUrl: (tmdbId) => `https://www.2embed.cc/embed/tmdb/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 5. Gomo.to
-  {
-    name: "gomo",
-    label: "Gomo",
-    priority: 5,
-    getUrl: (tmdbId) => `https://gomo.to/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 6. AutoEmbed
+  // 4. AutoEmbed
   {
     name: "autoembed",
     label: "AutoEmbed",
-    priority: 6,
+    priority: 4,
     getUrl: (tmdbId) => `https://autoembed.cc/embed/movie/${tmdbId}`,
     languages: ["dub", "sub"],
   },
-  // 7. MovieAPI
+  // 5. Vidsrc.xyz (Embedder)
   {
-    name: "movieapi",
-    label: "MovieAPI",
-    priority: 7,
-    getUrl: (tmdbId) => `https://movieapi.to/embed/movie/${tmdbId}`,
+    name: "vidsrc-xyz",
+    label: "VidSrc.xyz",
+    priority: 5,
+    getUrl: (tmdbId) => `https://vidsrc.xyz/embed/movie/${tmdbId}`,
     languages: ["dub", "sub"],
   },
-  // 8. SimpleEmbed
-  {
-    name: "simpleembed",
-    label: "SimpleEmbed",
-    priority: 8,
-    getUrl: (tmdbId) => `https://simpleembed.to/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 9. Driveembed
-  {
-    name: "driveembed",
-    label: "Driveembed",
-    priority: 9,
-    getUrl: (tmdbId) => `https://driveembed.xyz/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 10. Smashystream
-  {
-    name: "smashystream",
-    label: "Smashystream",
-    priority: 10,
-    getUrl: (tmdbId) => `https://smashystream.com/play/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 11. StreamHide
-  {
-    name: "streamhide",
-    label: "StreamHide",
-    priority: 11,
-    getUrl: (tmdbId) => `https://streamhide.to/embed/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 12. Hydrax
-  {
-    name: "hydrax",
-    label: "Hydrax",
-    priority: 12,
-    getUrl: (tmdbId) => `https://player.hydrax.app/watch/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 13. MultiEmbed
+  // 6. MultiEmbed
   {
     name: "multiembed",
     label: "MultiEmbed",
-    priority: 13,
+    priority: 6,
     getUrl: (tmdbId) => `https://multiembed.mov/directstream.php?video_id=${tmdbId}&tmdb=1`,
+    languages: ["dub", "sub"],
+  },
+  // 7. Gomo.to
+  {
+    name: "gomo",
+    label: "Gomo",
+    priority: 7,
+    getUrl: (tmdbId) => `https://gomo.to/movie/${tmdbId}`,
+    languages: ["dub", "sub"],
+  },
+  // 8. MovieAPI
+  {
+    name: "movieapi",
+    label: "MovieAPI",
+    priority: 8,
+    getUrl: (tmdbId) => `https://movieapi.to/embed/movie/${tmdbId}`,
+    languages: ["dub", "sub"],
+  },
+  // 9. Smashystream
+  {
+    name: "smashystream",
+    label: "Smashystream",
+    priority: 9,
+    getUrl: (tmdbId) => `https://smashystream.com/play/${tmdbId}`,
+    languages: ["dub", "sub"],
+  },
+  // 10. SimpleEmbed
+  {
+    name: "simpleembed",
+    label: "SimpleEmbed",
+    priority: 10,
+    getUrl: (tmdbId) => `https://simpleembed.to/movie/${tmdbId}`,
+    languages: ["dub", "sub"],
+  },
+  // 11. Driveembed
+  {
+    name: "driveembed",
+    label: "Driveembed",
+    priority: 11,
+    getUrl: (tmdbId) => `https://driveembed.xyz/movie/${tmdbId}`,
+    languages: ["dub", "sub"],
+  },
+  // 12. StreamHide
+  {
+    name: "streamhide",
+    label: "StreamHide",
+    priority: 12,
+    getUrl: (tmdbId) => `https://streamhide.to/embed/movie/${tmdbId}`,
+    languages: ["dub", "sub"],
+  },
+  // 13. Hydrax
+  {
+    name: "hydrax",
+    label: "Hydrax",
+    priority: 13,
+    getUrl: (tmdbId) => `https://player.hydrax.app/watch/${tmdbId}`,
     languages: ["dub", "sub"],
   },
   // 14. BestEmbed

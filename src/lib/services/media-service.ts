@@ -69,9 +69,10 @@ export class MediaService {
         libraries: includedLibraries.length > 0 ? includedLibraries : undefined,
         watchProviders,
         watchRegion,
-        limit: 20 
+        limit,
+        offset: page * limit 
       }, auth);
-      return { items: results, hasMore: false };
+      return { items: results, hasMore: results.length >= limit };
     }
 
     // 4. Handle Session vs Solo Mode

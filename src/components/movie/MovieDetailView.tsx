@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useCallback, useMemo, useRef } from "react";
+import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Clock, Star, HeartOff, Bookmark, ShieldCheck, ExternalLink, Percent, X, AlertCircle, Loader2, Volume2, Captions, Globe } from "lucide-react";
+import { Play, Clock, Star, HeartOff, Bookmark, ShieldCheck, ExternalLink, Percent, X, AlertCircle, Loader2, Volume2, Captions, Globe, Maximize, MonitorSmartphone } from "lucide-react";
 import { UserAvatarList } from "../session/UserAvatarList";
 import { useQuery } from "@tanstack/react-query";
 import { MediaItem, WatchProvider } from "@/types";
@@ -39,6 +39,7 @@ export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionC
   const [playerError, setPlayerError] = useState<string | null>(null);
   const [isSwitchingSource, setIsSwitchingSource] = useState(false);
   const iframeKeyRef = useRef(0);
+  const playerContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollY = useMotionValue(0);
   const imgY = useTransform(scrollY, [0, 300], [0, 300]);
@@ -91,6 +92,63 @@ export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionC
   }, [movieId, selectedLang]);
 
   const currentEmbed = embedChain[chainIndex] || null;
+  const hasNextProvider = chainIndex < embedChain.length - 1;
+
+  // Fullscreen / landscape helpers
+  const enterFullscreenLandscape = useCallback(() => {
+    const el = playerContainerRef.current;
+    if (!el) return;
+    try {
+      el.requestFullscreen().then(() => {
+        try {
+          (screen.orientation as any).lock?.('landscape');
+        } catch {
+          // orientation lock may not be supported
+        }
+      }).catch(() => {
+        // fullscreen request may fail
+      });
+    } catch {
+      // fullscreen API not available
+    }
+  }, []);
+
+  const exitFullscreenLandscape = useCallback(() => {
+    try {
+      (screen.orientation as any).unlock?.();
+    } catch {
+      // orientation unlock may not be supported
+    }
+    try {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    } catch {
+      // exitFullscreen may not be available
+    }
+  }, []);
+
+  // Auto-enter fullscreen when play starts
+  useEffect(() => {
+    if (isPlaying) {
+      // Small delay to let the iframe render
+      const timer = setTimeout(enterFullscreenLandscape, 300);
+      return () => clearTimeout(timer);
+    } else {
+      exitFullscreenLandscape();
+    }
+  }, [isPlaying, enterFullscreenLandscape, exitFullscreenLandscape]);
+
+  // Listen for fullscreen exit to sync state
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && isPlaying) {
+        // User exited fullscreen manually, but don't stop playing
+      }
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, [isPlaying]);
 
   const handlePlay = useCallback((lang?: LanguageMode) => {
     if (embedChain.length === 0) return;
@@ -117,7 +175,7 @@ export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionC
 
   const handleSourceError = useCallback(() => {
     if (chainIndex < embedChain.length - 1) {
- setChainIndex(prev => prev + 1);
+      setChainIndex(prev => prev + 1);
       setPlayerError(null);
       setIsSwitchingSource(true);
       iframeKeyRef.current++;
@@ -127,12 +185,22 @@ export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionC
     }
   }, [chainIndex, embedChain.length]);
 
+  const handleNextServer = useCallback(() => {
+    if (chainIndex < embedChain.length - 1) {
+      setChainIndex(prev => prev + 1);
+      setPlayerError(null);
+      setIsSwitchingSource(true);
+      iframeKeyRef.current++;
+    }
+  }, [chainIndex, embedChain.length]);
+
   const handleStopPlaying = useCallback(() => {
+    exitFullscreenLandscape();
     setIsPlaying(false);
     setPlayerError(null);
     setChainIndex(0);
     setIsSwitchingSource(false);
-  }, []);
+  }, [exitFullscreenLandscape]);
 
   // Reset chain index when language changes (via useEffect for embedChain)
   React.useEffect(() => {
@@ -278,6 +346,25 @@ export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionC
                         <span className="text-[10px] text-white/50 hidden sm:block">
                           {currentEmbed.provider.label}
                         </span>
+                        {/* Manual next server button */}
+                        {hasNextProvider && !isSwitchingSource && (
+                          <Button
+                            variant="secondary" size="sm"
+                            className="h-7 px-2 text-[10px] rounded-full bg-black/50 hover:bg-black/80 text-white/70 hover:text-white border-0 gap-1"
+                            onClick={handleNextServer}
+                          >
+                            Próximo servidor
+                          </Button>
+                        )}
+                        {/* Fullscreen button */}
+                        <Button
+                          variant="secondary" size="icon"
+                          className="size-7 rounded-full bg-black/50 hover:bg-black/80 text-white border-0"
+                          onClick={enterFullscreenLandscape}
+                          title="Tela cheia"
+                        >
+                          <Maximize className="w-3.5 h-3.5" />
+                        </Button>
                         <Button
                           variant="secondary" size="icon"
                           className="size-7 rounded-full bg-black/50 hover:bg-black/80 text-white border-0"
@@ -289,7 +376,7 @@ export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionC
                     </div>
 
                     {/* iframe */}
-                    <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
+                    <div ref={playerContainerRef} className="relative w-full" style={{ aspectRatio: "16/9" }}>
                       <iframe
                         key={iframeKeyRef.current}
                         src={currentEmbed.url}
@@ -301,6 +388,14 @@ export function MovieDetailView({ movieId, onClose, showLikedBy = true, sessionC
                         onLoad={() => setIsSwitchingSource(false)}
                         title={`Player - ${movie.Name}`}
                       />
+                      {/* Fullscreen overlay button on the player */}
+                      <button
+                        onClick={enterFullscreenLandscape}
+                        className="absolute bottom-3 right-3 z-10 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 transition-colors opacity-0 hover:opacity-100 focus:opacity-100"
+                        title="Tela cheia / Paisagem"
+                      >
+                        <MonitorSmartphone className="w-5 h-5" />
+                      </button>
                     </div>
 
                     {/* Error overlay */}
