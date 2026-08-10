@@ -19,7 +19,7 @@ export default function Home() {
   useHotkeys("3", () => setTab("likes"), []);
 
   return (
-    <main className="overflow-hidden h-full pt-[env(safe-area-inset-top)] font-sans">
+    <main className="h-full pt-[env(safe-area-inset-top)] font-sans">
       <DynamicBackground show={tab === "swipe"} />
       <div className="h-full flex flex-col">
 
@@ -58,7 +58,7 @@ export default function Home() {
           </div>
 
           {/* Tab content — no sliding, simple show/hide with fade */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 min-h-0">
             <AnimatePresence mode="wait">
               {tab === "swipe" && (
                 <motion.div
@@ -67,7 +67,7 @@ export default function Home() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="h-full flex justify-center"
+                  className="h-full flex justify-center overflow-hidden"
                 >
                   <div className="w-full max-w-md h-full px-4">
                     <CardDeck />
