@@ -1,9 +1,8 @@
 /**
  * Embed Providers Configuration
  * 
- * All streaming embed sources with priority order.
- * The system auto-selects the best active source based on language preference.
- * Users choose language (dubbed/subbed), NOT the player.
+ * VidSrc is the primary provider for all movies.
+ * Fallback chain uses only reliable VidSrc variants to avoid ad/popup redirects.
  */
 
 export interface EmbedProvider {
@@ -32,128 +31,40 @@ export const LANGUAGE_OPTIONS: LanguageOption[] = [
 ];
 
 /**
- * Complete provider list in priority order.
- * Most reliable providers first.
+ * VidSrc is the primary provider. Only reliable VidSrc variants
+ * are used to prevent ad/popup redirects from sketchy hosts.
  */
 export const EMBED_PROVIDERS: EmbedProvider[] = [
-  // 1. 2Embed (2embed.cc) — very reliable, has Portuguese content
+  // 1. VidSrc.cc — PRIMARY, most reliable, clean player
   {
-    name: "2embed",
-    label: "2Embed",
+    name: "vidsrc-cc",
+    label: "VidSrc",
     priority: 1,
-    getUrl: (tmdbId) => `https://www.2embed.cc/embed/tmdb/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 2. VidSrc (vidsrc.me) — reliable alternative
-  {
-    name: "vidsrc-me",
-    label: "VidSrc.me",
-    priority: 2,
-    getUrl: (tmdbId) => `https://vidsrc.me/embed/tmdb/${tmdbId}`,
+    getUrl: (tmdbId) => `https://vidsrc.cc/embed/movie/${tmdbId}`,
     languages: ["dub", "sub", "original"],
   },
-  // 3. VidSrc (vidsrc.to) — kept as option
+  // 2. VidSrc.to — backup VidSrc
   {
     name: "vidsrc-to",
-    label: "VidSrc",
-    priority: 3,
+    label: "VidSrc.to",
+    priority: 2,
     getUrl: (tmdbId) => `https://vidsrc.to/embed/movie/${tmdbId}`,
     languages: ["dub", "sub", "original"],
   },
-  // 4. AutoEmbed
+  // 3. VidSrc.me — alternate VidSrc
   {
-    name: "autoembed",
-    label: "AutoEmbed",
-    priority: 4,
-    getUrl: (tmdbId) => `https://autoembed.cc/embed/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
+    name: "vidsrc-me",
+    label: "VidSrc.me",
+    priority: 3,
+    getUrl: (tmdbId) => `https://vidsrc.me/embed/tmdb/${tmdbId}`,
+    languages: ["dub", "sub", "original"],
   },
-  // 5. Vidsrc.xyz (Embedder)
+  // 4. VidSrc.xyz — another reliable variant
   {
     name: "vidsrc-xyz",
     label: "VidSrc.xyz",
-    priority: 5,
+    priority: 4,
     getUrl: (tmdbId) => `https://vidsrc.xyz/embed/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 6. MultiEmbed
-  {
-    name: "multiembed",
-    label: "MultiEmbed",
-    priority: 6,
-    getUrl: (tmdbId) => `https://multiembed.mov/directstream.php?video_id=${tmdbId}&tmdb=1`,
-    languages: ["dub", "sub"],
-  },
-  // 7. Gomo.to
-  {
-    name: "gomo",
-    label: "Gomo",
-    priority: 7,
-    getUrl: (tmdbId) => `https://gomo.to/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 8. MovieAPI
-  {
-    name: "movieapi",
-    label: "MovieAPI",
-    priority: 8,
-    getUrl: (tmdbId) => `https://movieapi.to/embed/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 9. Smashystream
-  {
-    name: "smashystream",
-    label: "Smashystream",
-    priority: 9,
-    getUrl: (tmdbId) => `https://smashystream.com/play/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 10. SimpleEmbed
-  {
-    name: "simpleembed",
-    label: "SimpleEmbed",
-    priority: 10,
-    getUrl: (tmdbId) => `https://simpleembed.to/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 11. Driveembed
-  {
-    name: "driveembed",
-    label: "Driveembed",
-    priority: 11,
-    getUrl: (tmdbId) => `https://driveembed.xyz/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 12. StreamHide
-  {
-    name: "streamhide",
-    label: "StreamHide",
-    priority: 12,
-    getUrl: (tmdbId) => `https://streamhide.to/embed/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 13. Hydrax
-  {
-    name: "hydrax",
-    label: "Hydrax",
-    priority: 13,
-    getUrl: (tmdbId) => `https://player.hydrax.app/watch/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 14. BestEmbed
-  {
-    name: "bestembed",
-    label: "BestEmbed",
-    priority: 14,
-    getUrl: (tmdbId) => `https://bestembed.xyz/movie/${tmdbId}`,
-    languages: ["dub", "sub"],
-  },
-  // 15. UltraEmbed
-  {
-    name: "ultraembed",
-    label: "UltraEmbed",
-    priority: 15,
-    getUrl: (tmdbId) => `https://ultraembed.to/movie/${tmdbId}`,
     languages: ["dub", "sub"],
   },
 ];
