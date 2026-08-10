@@ -120,9 +120,14 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    height: 100%;
+  }
   body {
     @apply bg-background text-foreground font-sans;
     padding-bottom: -env(safe-area-inset-bottom);
+    height: 100%;
+    overflow: hidden;
   }
 }
 

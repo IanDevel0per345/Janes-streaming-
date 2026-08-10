@@ -1,6 +1,5 @@
 "use client";
 import { CardDeck } from "@/components/deck/CardDeck";
-import { SessionManager } from "@/components/session/SessionManager";
 import { LikesList } from "@/components/likes/LikesList";
 import { CatalogList } from "@/components/catalog/CatalogList";
 import { GalleryHorizontalEnd, Heart, LayoutGrid } from "lucide-react";
@@ -23,9 +22,8 @@ export default function Home() {
       <DynamicBackground show={tab === "swipe"} />
       <div className="h-full flex flex-col">
 
-        {/* Top bar: session + settings icons */}
+        {/* Top bar: settings icon */}
         <div className="w-full max-w-7xl mx-auto mt-2 min-w-0 relative px-4">
-          <SessionManager />
           <SettingsSidebar />
         </div>
 
