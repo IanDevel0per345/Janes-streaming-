@@ -28,7 +28,7 @@ export function CatalogList() {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(50);
+  const [totalPages, setTotalPages] = useState(1500);
   const [totalResults, setTotalResults] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -40,7 +40,7 @@ export function CatalogList() {
       if (term) params.set("searchTerm", term);
       const res = await apiClient.get<CatalogResponse>(`/api/media/catalog?${params}`);
       setItems(res.data.items || []);
-      setTotalPages(res.data.totalPages || 50);
+      setTotalPages(res.data.totalPages || 1500);
       setTotalResults(res.data.totalResults || 0);
       setCurrentPage(res.data.currentPage || page);
     } catch {
@@ -91,7 +91,7 @@ export function CatalogList() {
   // Generate visible page numbers for pagination
   const getPageNumbers = () => {
     const pages: (number | "...")[] = [];
-    const total = Math.min(totalPages, 50);
+    const total = Math.min(totalPages, 1500);
 
     if (total <= 7) {
       for (let i = 1; i <= total; i++) pages.push(i);
@@ -144,7 +144,7 @@ export function CatalogList() {
             </h2>
           </div>
           <span className="text-xs text-muted-foreground font-mono">
-            Sessão {currentPage}/{Math.min(totalPages, 50)}
+            Sessão {currentPage}/{Math.min(totalPages, 1500)}
           </span>
         </div>
       )}
@@ -212,7 +212,7 @@ export function CatalogList() {
               variant="ghost"
               size="icon"
               className="size-8"
-              disabled={currentPage >= Math.min(totalPages, 50)}
+              disabled={currentPage >= Math.min(totalPages, 1500)}
               onClick={() => goToSession(currentPage + 1)}
             >
               <ChevronRight className="size-4" />
@@ -220,7 +220,7 @@ export function CatalogList() {
           </div>
           {hasSearched && totalPages > 1 && (
             <p className="text-center text-[10px] text-muted-foreground mt-1.5 font-mono">
-              Página {currentPage} de {Math.min(totalPages, 50)}
+              Página {currentPage} de {Math.min(totalPages, 1500)}
             </p>
           )}
         </div>
