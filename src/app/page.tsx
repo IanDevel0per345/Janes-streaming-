@@ -11,7 +11,7 @@ import { DynamicBackground } from "@/components/deck/DynamicBackground";
 import { AnimatePresence, motion } from "motion/react";
 
 export default function Home() {
-  const [tab, setTab] = useState("swipe");
+  const [tab, setTab] = useState("catalog");
 
   useHotkeys("1", () => setTab("swipe"), []);
   useHotkeys("2", () => setTab("catalog"), []);

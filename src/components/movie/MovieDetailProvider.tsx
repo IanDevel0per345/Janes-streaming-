@@ -2,9 +2,18 @@
 
 import React, { createContext, useContext, useState } from "react";
 import { MovieDetailView } from "./MovieDetailView";
+import { ContentType } from "@/lib/embed-providers";
+import { LiveChannel } from "@/lib/live-channels";
+
+interface MovieDetailOptions {
+  showLikedBy?: boolean;
+  sessionCode?: string | null;
+  contentType?: ContentType;
+  liveChannel?: LiveChannel;
+}
 
 interface MovieDetailContextType {
-  openMovie: (id: string, options?: { showLikedBy?: boolean; sessionCode?: string | null }) => void;
+  openMovie: (id: string, options?: MovieDetailOptions) => void;
   closeMovie: () => void;
 }
 
@@ -12,28 +21,27 @@ const MovieDetailContext = createContext<MovieDetailContextType | undefined>(und
 
 export function MovieDetailProvider({ children }: { children: React.ReactNode }) {
   const [selectedMovieId, setSelectedMovieId] = useState<string | null>(null);
-  const [showLikedBy, setShowLikedBy] = useState<boolean | undefined>();
-  const [sessionCode, setSessionCode] = useState<string | null | undefined>();
+  const [options, setOptions] = useState<MovieDetailOptions | undefined>();
 
-  const openMovie = (id: string, options?: { showLikedBy?: boolean; sessionCode?: string | null }) => { 
-    setSelectedMovieId(id); 
-    setShowLikedBy(options?.showLikedBy);
-    setSessionCode(options?.sessionCode);
-  }
-  const closeMovie = () => { 
-    setSelectedMovieId(null); 
-    setShowLikedBy(undefined);
-    setSessionCode(undefined);
-  }
+  const openMovie = (id: string, opts?: MovieDetailOptions) => {
+    setSelectedMovieId(id);
+    setOptions(opts);
+  };
+  const closeMovie = () => {
+    setSelectedMovieId(null);
+    setOptions(undefined);
+  };
 
   return (
     <MovieDetailContext.Provider value={{ openMovie, closeMovie }}>
       {children}
-      <MovieDetailView 
-        movieId={selectedMovieId} 
-        onClose={closeMovie} 
-        showLikedBy={showLikedBy} 
-        sessionCode={sessionCode}
+      <MovieDetailView
+        movieId={selectedMovieId}
+        onClose={closeMovie}
+        showLikedBy={options?.showLikedBy}
+        sessionCode={options?.sessionCode}
+        contentType={options?.contentType}
+        liveChannel={options?.liveChannel}
       />
     </MovieDetailContext.Provider>
   );
